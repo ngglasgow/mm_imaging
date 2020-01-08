@@ -1,9 +1,9 @@
 import os
 
 cwd = os.getcwd()
-
-file_list = os.listdir(cwd)
-
+image_dir = '191014VJ_C448L_4_1_gfp_1/'
+file_list = os.listdir(image_dir)
+os.chdir(image_dir)
 for file in file_list:
     if '.tif' in file:
         file_split = file.split('_')
@@ -11,6 +11,8 @@ for file in file_list:
         ypos = file_split[-1][:3]
 
         new_name = 'x' + xpos + '_y' + ypos + '.tif'
+
+        os.rename(file, new_name)
 
 import re
 
