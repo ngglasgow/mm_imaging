@@ -7,7 +7,6 @@ import os
 
 def main():
     path = os.getcwd()
-    count = 1
 
     for root, dirs, files in os.walk(path):
         for file in files:
