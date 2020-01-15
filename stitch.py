@@ -1,3 +1,33 @@
+import imagej
+import numpy as np
+from skimage import io
+import os
+
+# set paths
+machine = os.uname()[0]
+if machine == 'Darwin':
+    home_dir = '/Volumes/Urban'
+
+elif machine == 'Linux':
+    home_dir = '/run/user/1000/gvfs/smb-share:server=sds1.neurobio.pitt.edu,share=urban'
+
+else:
+    home_dir = os.path.join('Z:', os.sep)
+
+project_dir = os.path.join(home_dir, 'Glasgow', 'ng_testing')
+figure_dir = os.path.join(project_dir, 'figures')
+table_dir = os.path.join(project_dir, 'tables')
+data_dir = os.path.join(project_dir, '190821')
+filedir_list = os.listdir(data_dir)
+
+imagej_version = 'sc.fiji:fiji:2.0.0-pre-8'
+
+ij = imagej.init(ij_dir_or_version_or_endpoint='/home/ngg1/Fiji.app', headless=False)
+
+ij.ui().showUI()
+
+from jnius import autoclass
+IJ = autoclass('ij.IJ')
 # below is the JS output from fiji when running a fusion directly, need to put into python imagej format and go from there
 
 IJ.run("Grid/Collection stitching",
@@ -17,5 +47,6 @@ IJ.run("Grid/Collection stitching",
        absolute_displacement_threshold=3.50 \
        compute_overlap computation_parameters=[Save memory (but be slower)] \
        image_output=[Fuse and display]");
-imp2 = imp.duplicate();
-imp.close();
+imp = IJ.getImage()
+imp2 = imp.duplicate()
+imp.close()
