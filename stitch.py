@@ -21,8 +21,9 @@ data_dir = os.path.join(project_dir, '190821')
 filedir_list = os.listdir(data_dir)
 
 imagej_version = 'sc.fiji:fiji:2.0.0-pre-8'
+fiji_path = os.path.join(home_dir, 'Fiji.app')
 
-ij = imagej.init(ij_dir_or_version_or_endpoint='/home/ngg1/Fiji.app', headless=False)
+ij = imagej.init(fiji_path, headless=False)
 
 ij.ui().showUI()
 
