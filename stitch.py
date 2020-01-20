@@ -108,9 +108,16 @@ with os.scandir(data_root) as it:
             make_fusion(data_root, entry.name)
 
 # server
-with os.scandir(server_project) as it:
+for dir in os.listdir(server_project):
+    if dir.startswith('19') and not dir.endswith('.txt'):
+        data_root = os.path.join(server_project, dir)
+        with os.scandir(data_root) as it:
+            for entry in it:
+                if entry.is_dir() and entry.name.startswith('19'):
+                    make_fusion(data_root, entry.name)
+
+
+with os.scandir(data_root) as it:
     for entry in it:
         if entry.is_dir() and entry.name.startswith('19'):
-            make_fusion(server_project, entry.name)
-
-
+            print(entry.name)
