@@ -28,16 +28,7 @@ table_path = os.path.join(project_path, 'tables')
 data_root = os.path.join(project_path, '191014VJ_C448L')
 test_data_path = os.path.join(project_path, '191014VJ_C448L_4_1_gfp_1')
 
-# choose imagej/fiji to use, uncomment imagej_version to use the cached version
-# imagej_version = 'sc.fiji:fiji:2.0.0-pre-8'
-local_fiji = os.path.join(home_path, 'Fiji.app')
 
-ij = imagej.init(local_fiji, headless=False)
-
-ij.ui().showUI()
-
-
-IJ = autoclass('ij.IJ')
 # below is the JS output from fiji when running a fusion directly, need to put into python imagej format and go from there
 
 #TODO
@@ -45,41 +36,6 @@ IJ = autoclass('ij.IJ')
 # at minimum need x, y, and directory
 # maybe just make a plus script
 
-def make_fusion(root, dir):
-    data_dir = os.path.join(root, dir)
-    x, y = get_rows_columns(data_dir)
-    save_path = os.path.join(root, 'fused', dir)
-
-    IJ.run("Grid/Collection stitching",
-        "type=[Filename defined position] \
-        order=[Defined by filename         ] \
-        grid_size_x=%d \
-        grid_size_y=%d \
-        tile_overlap=20 \
-        first_file_index_x=0 \
-        first_file_index_y=0 \
-        directory=%s \
-        file_names=x{xxx}_y{yyy}.tif \
-        output_textfile_name=TileConfiguration.txt \
-        fusion_method=[Linear Blending] \
-        regression_threshold=0.30 \
-        max/avg_displacement_threshold=2.50 \
-        absolute_displacement_threshold=3.50 \
-        compute_overlap subpixel_accuracy computation_parameters=[Save memory (but be slower)] \
-        image_output=[Fuse and display]" % (x, y, data_dir))
-    imp = IJ.getImage()
-    IJ.saveAs(imp, "Tiff", save_path + ".tif")
-    imp.close()
-
-for root, dirs, files in os.walk(data_root):
-    for dir in dirs:
-        make_fusion(data_root, dir)
-
-
-for root, dirs, files in os.walk(data_root):
-    for dir in dirs:
-        if 'VJ' in dir:
-            make_fusion(root, dir)
 
 def get_rows_columns(data_dir):
     xs = []
@@ -98,5 +54,47 @@ def get_rows_columns(data_dir):
     return xmax, ymax
 
 
-x, y = get_rows_columns(test_data_path)
+def make_fusion(root, dir):
+    data_dir = os.path.join(root, dir)
+    x, y = get_rows_columns(data_dir)
+    save_path = os.path.join(root, 'fused', dir + '.tif')
+
+    IJ.run("Grid/Collection stitching",
+        "type=[Filename defined position] \
+        order=[Defined by filename         ] \
+        grid_size_x=%d \
+        grid_size_y=%d \
+        tile_overlap=10 \
+        first_file_index_x=0 \
+        first_file_index_y=0 \
+        directory=%s \
+        file_names=x{xxx}_y{yyy}.tif \
+        output_textfile_name=TileConfiguration.txt \
+        fusion_method=[Linear Blending] \
+        regression_threshold=0.30 \
+        max/avg_displacement_threshold=2.50 \
+        absolute_displacement_threshold=3.50 \
+        compute_overlap subpixel_accuracy computation_parameters=[Save memory (but be slower)] \
+        image_output=[Fuse and display]" % (x, y, data_dir))
+    imp = IJ.getImage()
+    IJ.saveAs(imp, "Tiff", save_path)
+    imp.close()
+
+# choose imagej/fiji to use, uncomment imagej_version to use the cached version
+# imagej_version = 'sc.fiji:fiji:2.0.0-pre-8'
+local_fiji = os.path.join(home_path, 'Fiji.app')
+
+ij = imagej.init(local_fiji, headless=False)
+
+ij.ui().showUI()
+
+IJ = autoclass('ij.IJ')
+
+with os.scandir(data_root) as it:
+    for entry in it:
+        if entry.is_dir() and entry.name.startswith('19'):
+            print(os.path.join(data_root, entry.name))
+            print(os.path.join(data_root, 'fused', entry.name + '.tif'))
+
+
 

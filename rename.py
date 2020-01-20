@@ -10,7 +10,7 @@ def main():
 
     for root, dirs, files in os.walk(path):
         for file in files:
-            if '.tif' in file:
+            if file.endswith('.tif'):
                 if 'Pos' in file:
                     name_split = file.split('_')
                     xpos = name_split[-2][-3:]
@@ -22,6 +22,15 @@ def main():
                     dst = os.path.join(root, new_name)
 
                     os.rename(src, dst)
+                '''
+                elif not file.startswith('x'):
+                    new_name = file[-13:]
+                    src = os.path.join(root, file)
+                    dst = os.path.join(root, new_name)
+                    os.rename(src, dst)
+                '''
+
 
 if __name__ == '__main__':
     main()
+
