@@ -2,7 +2,6 @@ import imagej
 import numpy as np
 import os
 import re
-from jnius import autoclass
 
 def server():
     '''function to define path to server base directory'''
@@ -12,7 +11,7 @@ def server():
         server_dir = '/Volumes/Urban'
 
     elif machine == 'Linux':
-        server_dir = '/run/user/1000/gvfs/smb-share:server=sds1.neurobio.pitt.edu,share=urban'
+        server_dir = '/run/user/1000/gvfs/smb-share:server=130.49.237.41,share=urban'
 
     else:
         server_dir = os.path.join('Z:', os.sep)
@@ -28,7 +27,8 @@ table_path = os.path.join(project_path, 'tables')
 data_root = os.path.join(project_path, '191014VJ_C448L')
 test_data_path = os.path.join(project_path, '191014VJ_C448L_4_1_gfp_1')
 
-
+server_dir = server()
+server_project = os.path.join(server_dir, 'Glasgow', 'injections')
 # below is the JS output from fiji when running a fusion directly, need to put into python imagej format and go from there
 
 #TODO
@@ -88,13 +88,29 @@ ij = imagej.init(local_fiji, headless=False)
 
 ij.ui().showUI()
 
+from jnius import autoclass
+
 IJ = autoclass('ij.IJ')
 
+#TODO
+# -make into module instead
+# -make this a separate script
+# -clean up code
+# -write new running script to call base functions
+# -add code to join overlays
+# - look into how to change parameters of stitching
+# - look into how to open up temp dirs to make it faster off of the server
+
+# local
 with os.scandir(data_root) as it:
     for entry in it:
         if entry.is_dir() and entry.name.startswith('19'):
-            print(os.path.join(data_root, entry.name))
-            print(os.path.join(data_root, 'fused', entry.name + '.tif'))
+            make_fusion(data_root, entry.name)
 
+# server
+with os.scandir(server_project) as it:
+    for entry in it:
+        if entry.is_dir() and entry.name.startswith('19'):
+            make_fusion(server_project, entry.name)
 
 
